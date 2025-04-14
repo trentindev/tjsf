@@ -1,37 +1,53 @@
-import { Component } from "../core/component";
 import { createElement } from "../core/dom";
+import { initRouter } from "../core/router";
 
-// Composant compteur avec état local
-const Counter = Component(({ state, setState }) => {
-  const count = state.count || 0;
-
+// Composants de vue
+function Home() {
   return createElement(
     "div",
-    { class: "counter" },
-    createElement("p", {}, `Valeur locale : ${count}`),
-    createElement(
-      "button",
-      {
-        onClick: () => setState({ count: count + 1 }),
-      },
-      "Incrémenter"
-    )
+    {},
+    createElement("h2", {}, "Accueil"),
+    createElement("p", {}, "Bienvenue sur la page d’accueil.")
   );
-});
+}
 
-// Composant principal App
+function About() {
+  return createElement(
+    "div",
+    {},
+    createElement("h2", {}, "À propos"),
+    createElement("p", {}, "Ceci est une page à propos.")
+  );
+}
+
+// Composant App avec liens de navigation
 function App() {
   return createElement(
     "div",
     { class: "app-container" },
-    createElement("h1", {}, "Deux compteurs indépendants"),
-    createElement("p", {}, "Chaque composant a son propre état."),
-    Counter(), // Instance A
-    Counter() // Instance B
+    createElement(
+      "nav",
+      {},
+      createElement("a", { href: "#/" }, "Accueil"),
+      " | ",
+      createElement("a", { href: "#/about" }, "À propos")
+    ),
+    createElement("main", { id: "view" }) // Vue dynamique ici
   );
 }
 
+// Initialisation
 document.addEventListener("DOMContentLoaded", () => {
   const root = document.getElementById("app");
-  root.appendChild(App());
+  root.appendChild(App()); // Affiche la structure de base
+
+  // Montre la bonne vue dans <main id="view">
+  const view = document.getElementById("view");
+  initRouter(
+    {
+      "/": Home,
+      "/about": About,
+    },
+    view
+  );
 });
