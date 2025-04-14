@@ -1,53 +1,39 @@
+import { bindStateToDOM } from "../core/binding";
 import { createElement } from "../core/dom";
-import { initRouter } from "../core/router";
+import { createState } from "../core/state";
 
-// Composants de vue
-function Home() {
-  return createElement(
-    "div",
-    {},
-    createElement("h2", {}, "Accueil"),
-    createElement("p", {}, "Bienvenue sur la page d’accueil.")
-  );
-}
-
-function About() {
-  return createElement(
-    "div",
-    {},
-    createElement("h2", {}, "À propos"),
-    createElement("p", {}, "Ceci est une page à propos.")
-  );
-}
-
-// Composant App avec liens de navigation
+// Composant qui ne dépend que de l’état initial
 function App() {
-  return createElement(
+  const root = createElement(
     "div",
     { class: "app-container" },
+    createElement("h1", {}, "Formulaire lié au State"),
+    createElement("input", {
+      type: "text",
+      placeholder: "Entrez votre nom",
+      "data-bind": "name",
+    }),
     createElement(
-      "nav",
+      "p",
       {},
-      createElement("a", { href: "#/" }, "Accueil"),
-      " | ",
-      createElement("a", { href: "#/about" }, "À propos")
-    ),
-    createElement("main", { id: "view" }) // Vue dynamique ici
+      "Bonjour, ",
+      createElement("span", { "data-bind": "name" })
+    )
   );
+
+  // Lier les champs DOM à l’état une seule fois
+  bindStateToDOM(root);
+
+  return root;
 }
 
-// Initialisation
 document.addEventListener("DOMContentLoaded", () => {
-  const root = document.getElementById("app");
-  root.appendChild(App()); // Affiche la structure de base
+  // Une seule initialisation de l’état
+  createState({ name: "" }, () => {
+    // NE FAIT RIEN ici volontairement
+    // On ne re-render pas tout, on laisse bindStateToDOM gérer les maj fines
+  });
 
-  // Montre la bonne vue dans <main id="view">
-  const view = document.getElementById("view");
-  initRouter(
-    {
-      "/": Home,
-      "/about": About,
-    },
-    view
-  );
+  const root = document.getElementById("app");
+  root.appendChild(App());
 });
