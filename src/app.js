@@ -1,16 +1,14 @@
 import { Component } from "../core/component";
 import { createElement } from "../core/dom";
-import { createState, getState, setState } from "../core/state";
 
-// Composant dynamique avec affichage de l’état
-const App = Component(() => {
-  const { count } = getState(); // On lit la valeur de l’état
+// Composant compteur avec état local
+const Counter = Component(({ state, setState }) => {
+  const count = state.count || 0;
 
   return createElement(
     "div",
-    { class: "app-container" },
-    createElement("h1", {}, "Compteur dynamique"),
-    createElement("p", {}, `Valeur actuelle : ${count}`),
+    { class: "counter" },
+    createElement("p", {}, `Valeur locale : ${count}`),
     createElement(
       "button",
       {
@@ -21,17 +19,19 @@ const App = Component(() => {
   );
 });
 
-// Fonction qui rend toute l’interface
-function renderApp() {
-  const root = document.getElementById("app");
-  root.innerHTML = ""; // Réinitialise le contenu
-  root.appendChild(App.render()); // Re-génère le composant avec le nouvel état
-  // Pour monitorer les changements d’état
-  console.log("Rendu de l’interface avec l’état actuel :", getState());
+// Composant principal App
+function App() {
+  return createElement(
+    "div",
+    { class: "app-container" },
+    createElement("h1", {}, "Deux compteurs indépendants"),
+    createElement("p", {}, "Chaque composant a son propre état."),
+    Counter(), // Instance A
+    Counter() // Instance B
+  );
 }
 
-// Initialisation
 document.addEventListener("DOMContentLoaded", () => {
-  createState({ count: 0 }, renderApp); // Initialisation de l’état + fonction de rendu
-  renderApp(); // Premier affichage
+  const root = document.getElementById("app");
+  root.appendChild(App());
 });
